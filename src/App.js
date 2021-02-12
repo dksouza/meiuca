@@ -1,56 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import React, {useEffect, useState} from 'react';
+import {Grid} from "@material-ui/core";
+import {CardContent} from "./components";
+import axios from "axios";
 
 function App() {
+
+  let url = 'http://newsapi.org/v2/top-headlines?' +
+          'country=br&' +
+          'apiKey=a3f95c6548384898b17c4d2a437a324c';
+
+  const [articles, setArticles] = useState([]);
+
+  const getNoticias = async () => {
+    try{
+      const data = await axios.get(url);
+      setArticles(data.data.articles);
+    }catch(err) {
+      console.error(err);
+    }
+  }
+
+  useEffect(() => {
+    getNoticias();
+  }, [])
+
+  const viewArticle = (url) => {
+    window.location.href = url;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
+    <div>
+      <Grid container>
+        {articles.map((item, index) => (
+        <Grid item md={4}>
+          <CardContent heading={item.title} subtitle={item.author} paragraph={item.description} titleButton="Ver notícia" onClick={() => viewArticle(item.url)} />
+        </Grid>
+        ))}
+      </Grid>
     </div>
   );
 }
